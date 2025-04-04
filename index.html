@@ -6,15 +6,19 @@
   <title>Razorpay Payment</title>
 </head>
 <body>
-  <h1>Razorpay Payment Gateway Integration</h1>
+  <h1>Razorpay Payment Gateway</h1>
   <form id="payment-form">
     <label for="amount">Amount:</label>
     <input type="number" id="amount" name="amount" required>
-    <button type="button" onclick="payNow()">Pay Now</button>
+    <button type="button" id="pay-button">Pay Now</button>
   </form>
 
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script>
+    window.onload = function () {
+      document.getElementById('pay-button').addEventListener('click', payNow);
+    };
+
     async function payNow() {
       const amount = document.getElementById('amount').value;
 
@@ -24,9 +28,9 @@
       }
 
       try {
-        // ✅ Create order by calling the backend
+        // ✅ Fetch Order from Backend
         const response = await fetch('https://payment-api-jade.vercel.app/createOrder', {
-            method: 'POST',
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ amount, currency: 'INR', receipt: 'receipt#1', notes: {} })
         });
@@ -35,14 +39,14 @@
 
         const order = await response.json();
 
-        // ✅ Open Razorpay Checkout with correct order_id
+        // ✅ Open Razorpay Checkout
         const options = {
           key: 'rzp_test_CABuOHaSHHGey2',  // Replace with your Razorpay key_id
-          amount: order.amount,  // ✅ Use amount from backend
+          amount: order.amount,  
           currency: order.currency,
           name: 'Acme Corp',
           description: 'Test Transaction',
-          order_id: order.id,  // ✅ Use the dynamically created order_id
+          order_id: order.id,  
           callback_url: 'https://payment-api-jade.vercel.app/payment-success',
           prefill: {
             name: 'Gaurav Kumar',
